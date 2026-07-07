@@ -64,8 +64,8 @@
   .stage{
     position:relative;
     width:100%;
-    max-width:400px;
-    perspective:1400px;
+    max-width:560px;
+    perspective:1600px;
     z-index:1;
   }
 
@@ -94,8 +94,8 @@
   /* ---------- Card ---------- */
   .card-wrap{
     width:100%;
-    aspect-ratio: 16 / 9.6;
-    max-height:70vh;
+    aspect-ratio: 1.75 / 1;
+    max-height:64vh;
     position:relative;
     transform-style:preserve-3d;
     cursor:pointer;
@@ -137,7 +137,7 @@
     display:flex;
     flex-direction:column;
     justify-content:space-between;
-    padding:clamp(22px, 5.5vw, 34px);
+    padding:clamp(20px, 4vw, 32px) clamp(24px, 5vw, 40px);
   }
 
   .face.back{
@@ -193,25 +193,41 @@
   }
   .eyebrow span{ color:var(--brass); }
 
+  .main-row{
+    display:flex;
+    align-items:center;
+    flex:1;
+    gap:clamp(18px, 4vw, 32px);
+    min-height:0;
+  }
+
   .identity{
-    margin-top:clamp(10px, 3vh, 22px);
+    flex:1 1 52%;
+    min-width:0;
   }
   .name{
     font-family:'Fraunces', serif;
     font-weight:500;
-    font-size:clamp(24px, 6vw, 32px);
-    line-height:1.05;
+    font-size:clamp(21px, 4.4vw, 30px);
+    line-height:1.08;
     letter-spacing:-0.01em;
     color:var(--paper);
-    margin:0 0 6px;
+    margin:0 0 7px;
   }
   .role{
-    font-size:13px;
+    font-size:clamp(11.5px, 2vw, 13px);
     color:var(--grey);
     font-weight:500;
     margin:0;
   }
   .role .dot{ color:var(--brass); margin:0 6px; }
+
+  .v-divider{
+    width:1px;
+    align-self:stretch;
+    background:linear-gradient(180deg, transparent, var(--line) 20%, var(--line) 80%, transparent);
+    flex-shrink:0;
+  }
 
   .divider{
     height:1px;
@@ -220,14 +236,25 @@
   }
 
   .contact-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:10px 16px;
+    display:flex;
+    flex-direction:column;
+    gap:clamp(8px, 1.6vh, 12px);
+    flex:1 1 40%;
+    min-width:0;
   }
   .contact-item{
     display:flex;
-    flex-direction:column;
-    gap:2px;
+    flex-direction:row;
+    align-items:baseline;
+    gap:8px;
+    min-width:0;
+  }
+  .contact-item .k{
+    flex-shrink:0;
+    width:52px;
+  }
+  .contact-item .v{
+    flex:1;
     min-width:0;
   }
   .contact-item .k{
@@ -267,27 +294,29 @@
 
   .qr-wrap{
     display:flex; align-items:center; gap:14px;
-    margin-top:auto;
+    flex:1 1 42%;
+    min-width:0;
   }
   .qr{
-    width:64px; height:64px;
+    width:clamp(48px, 11vw, 64px); height:clamp(48px, 11vw, 64px);
     border-radius:8px;
     flex-shrink:0;
   }
   .qr-label{
-    font-size:11.5px;
+    font-size:clamp(10.5px, 2vw, 11.5px);
     color:var(--grey);
     line-height:1.4;
-    max-width:180px;
   }
   .qr-label strong{ color:var(--paper); font-weight:600; display:block; margin-bottom:2px; }
 
   .addr{
-    font-size:12.5px;
+    font-size:clamp(11.5px, 2.2vw, 12.5px);
     color:var(--grey);
     line-height:1.6;
+    flex:1 1 52%;
+    min-width:0;
   }
-  .addr strong{ color:var(--paper); font-weight:500; }
+  .addr strong{ color:var(--paper); font-weight:500; display:block; margin-bottom:2px; }
 
   .back-foot{
     display:flex;
@@ -307,8 +336,18 @@
     .hint{ animation:none; opacity:1; }
   }
 
-  @media (max-width:380px){
-    .contact-grid{ grid-template-columns:1fr; }
+  @media (max-width:520px){
+    .card-wrap{ aspect-ratio: 1.6 / 1; }
+    .main-row{ gap:14px; }
+    .contact-item .k{ width:44px; }
+  }
+
+  @media (max-width:400px){
+    .card-wrap{ aspect-ratio: 1.42 / 1; max-height:58vh; }
+    .main-row{ flex-direction:column; align-items:stretch; gap:10px; justify-content:center; }
+    .v-divider{ width:auto; height:1px; align-self:stretch; }
+    .identity{ text-align:left; }
+    .contact-grid{ gap:6px; }
   }
 
   :focus-visible{
@@ -333,13 +372,14 @@
           <div class="eyebrow">MERIDIAN <span>&amp; CO.</span></div>
         </div>
 
-        <div class="identity">
-          <p class="name">Alexandra Reyes</p>
-          <p class="role">Director of Partnerships<span class="dot">&middot;</span>Strategy Group</p>
-        </div>
+        <div class="main-row">
+          <div class="identity">
+            <p class="name">Alexandra Reyes</p>
+            <p class="role">Director of Partnerships<span class="dot">&middot;</span>Strategy Group</p>
+          </div>
 
-        <div>
-          <div class="divider"></div>
+          <div class="v-divider"></div>
+
           <div class="contact-grid">
             <div class="contact-item">
               <span class="k">Email</span>
@@ -374,32 +414,36 @@
           <div class="mark">M</div>
         </div>
 
-        <div class="addr">
-          <strong>Registered Office</strong>
-          148 Bryant Street, Suite 400<br>
-          San Francisco, CA 94107<br>
-          United States
-        </div>
+        <div class="main-row">
+          <div class="addr">
+            <strong>Registered Office</strong>
+            148 Bryant Street, Suite 400<br>
+            San Francisco, CA 94107<br>
+            United States
+          </div>
 
-        <div class="qr-wrap">
-          <svg class="qr" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <rect width="100" height="100" rx="10" fill="#f4f2ec"/>
-            <g fill="#15171c">
-              <rect x="12" y="12" width="22" height="22"/><rect x="18" y="18" width="10" height="10" fill="#f4f2ec"/>
-              <rect x="66" y="12" width="22" height="22"/><rect x="72" y="18" width="10" height="10" fill="#f4f2ec"/>
-              <rect x="12" y="66" width="22" height="22"/><rect x="18" y="72" width="10" height="10" fill="#f4f2ec"/>
-              <rect x="42" y="12" width="6" height="6"/><rect x="52" y="12" width="6" height="6"/>
-              <rect x="42" y="22" width="6" height="6"/><rect x="42" y="42" width="6" height="6"/>
-              <rect x="52" y="42" width="6" height="6"/><rect x="62" y="42" width="6" height="6"/>
-              <rect x="42" y="52" width="6" height="6"/><rect x="52" y="52" width="6" height="6"/>
-              <rect x="42" y="62" width="6" height="6"/><rect x="72" y="52" width="6" height="6"/>
-              <rect x="62" y="62" width="6" height="6"/><rect x="72" y="72" width="6" height="6"/>
-              <rect x="52" y="72" width="6" height="6"/><rect x="82" y="42" width="6" height="6"/>
-              <rect x="82" y="62" width="6" height="6"/><rect x="42" y="82" width="6" height="6"/>
-              <rect x="62" y="82" width="6" height="6"/><rect x="82" y="82" width="6" height="6"/>
-            </g>
-          </svg>
-          <div class="qr-label"><strong>Save my contact</strong>Scan to add Alexandra to your address book.</div>
+          <div class="v-divider"></div>
+
+          <div class="qr-wrap">
+            <svg class="qr" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <rect width="100" height="100" rx="10" fill="#f4f2ec"/>
+              <g fill="#15171c">
+                <rect x="12" y="12" width="22" height="22"/><rect x="18" y="18" width="10" height="10" fill="#f4f2ec"/>
+                <rect x="66" y="12" width="22" height="22"/><rect x="72" y="18" width="10" height="10" fill="#f4f2ec"/>
+                <rect x="12" y="66" width="22" height="22"/><rect x="18" y="72" width="10" height="10" fill="#f4f2ec"/>
+                <rect x="42" y="12" width="6" height="6"/><rect x="52" y="12" width="6" height="6"/>
+                <rect x="42" y="22" width="6" height="6"/><rect x="42" y="42" width="6" height="6"/>
+                <rect x="52" y="42" width="6" height="6"/><rect x="62" y="42" width="6" height="6"/>
+                <rect x="42" y="52" width="6" height="6"/><rect x="52" y="52" width="6" height="6"/>
+                <rect x="42" y="62" width="6" height="6"/><rect x="72" y="52" width="6" height="6"/>
+                <rect x="62" y="62" width="6" height="6"/><rect x="72" y="72" width="6" height="6"/>
+                <rect x="52" y="72" width="6" height="6"/><rect x="82" y="42" width="6" height="6"/>
+                <rect x="82" y="62" width="6" height="6"/><rect x="42" y="82" width="6" height="6"/>
+                <rect x="62" y="82" width="6" height="6"/><rect x="82" y="82" width="6" height="6"/>
+              </g>
+            </svg>
+            <div class="qr-label"><strong>Save my contact</strong>Scan to add Alexandra to your address book.</div>
+          </div>
         </div>
 
         <div class="back-foot">
