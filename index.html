@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Card — Alexandra Reyes, Meridian &amp; Co.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     EDIT YOUR DETAILS HERE — everything else below is styling.
+     ============================================================ */
+  :root{
+    --name: "Alexandra Reyes";
+    --title: "Director of Partnerships";
+    --company: "Meridian & Co.";
+  }
+</style>
+<style>
+  :root{
+    --ink:        #0b0c10;
+    --plate:      #15171c;
+    --plate-2:    #1c1f26;
+    --line:       #2b2e36;
+    --paper:      #f4f2ec;
+    --paper-dim:  #9a9da6;
+    --grey:       #8b8d93;
+    --grey-dim:   #55575e;
+    --brass:      #c3a15a;
+    --brass-lt:   #f0dca0;
+    --brass-dk:   #8a6d33;
+    --focus:      #e4c989;
+    --radius:     18px;
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ height:100%; }
+
+  body{
+    margin:0;
+    min-height:100dvh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:
+      radial-gradient(ellipse 120% 80% at 50% -10%, #1a1c22 0%, var(--ink) 55%),
+      var(--ink);
+    font-family:'Inter', sans-serif;
+    color:var(--paper);
+    overflow-x:hidden;
+    padding:32px 20px;
+  }
+
+  /* faint ambient grain / vignette for the "stage" the card sits on */
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    background:radial-gradient(circle at 50% 40%, transparent 0%, rgba(0,0,0,0.55) 100%);
+    pointer-events:none;
+    z-index:0;
+  }
+
+  .stage{
+    position:relative;
+    width:100%;
+    max-width:400px;
+    perspective:1400px;
+    z-index:1;
+  }
+
+  .hint{
+    text-align:center;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--grey-dim);
+    margin-top:26px;
+    opacity:0;
+    animation:fadeIn 0.8s ease 1.4s forwards;
+    user-select:none;
+  }
+  .hint kbd{
+    display:inline-block;
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:1px 6px;
+    font-family:inherit;
+    color:var(--grey);
+    margin:0 2px;
+  }
+
+  /* ---------- Card ---------- */
+  .card-wrap{
+    width:100%;
+    aspect-ratio: 16 / 9.6;
+    max-height:70vh;
+    position:relative;
+    transform-style:preserve-3d;
+    cursor:pointer;
+    opacity:0;
+    transform:translateY(28px) scale(0.96);
+    animation:riseIn 0.9s cubic-bezier(.16,.9,.28,1) 0.15s forwards;
+  }
+
+  @keyframes riseIn{
+    to{ opacity:1; transform:translateY(0) scale(1); }
+  }
+  @keyframes fadeIn{ to{ opacity:1; } }
+
+  .card{
+    position:absolute; inset:0;
+    border-radius:var(--radius);
+    transform-style:preserve-3d;
+    transition: transform 0.15s ease-out;
+    will-change:transform;
+  }
+
+  .card.flipping{
+    transition: transform 0.7s cubic-bezier(.4,.1,.2,1);
+  }
+
+  .face{
+    position:absolute; inset:0;
+    border-radius:var(--radius);
+    backface-visibility:hidden;
+    -webkit-backface-visibility:hidden;
+    background:
+      linear-gradient(155deg, var(--plate-2) 0%, var(--plate) 45%, #101217 100%);
+    border:1px solid var(--line);
+    box-shadow:
+      0 30px 60px -20px rgba(0,0,0,0.65),
+      0 8px 20px -8px rgba(0,0,0,0.5),
+      inset 0 1px 0 rgba(255,255,255,0.04);
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    padding:clamp(22px, 5.5vw, 34px);
+  }
+
+  .face.back{
+    transform:rotateY(180deg);
+  }
+
+  /* foil light sweep — the signature element, follows pointer */
+  .sheen{
+    position:absolute; inset:-2px;
+    background: radial-gradient(
+      480px circle at var(--mx,50%) var(--my,20%),
+      rgba(240,220,160,0.16), rgba(240,220,160,0.05) 32%, transparent 60%
+    );
+    mix-blend-mode:screen;
+    pointer-events:none;
+    transition:opacity 0.4s ease;
+  }
+
+  .foil-line{
+    position:absolute;
+    top:0; left:0; right:0; height:3px;
+    background:linear-gradient(90deg, transparent, var(--brass-lt), var(--brass), transparent);
+    opacity:0.9;
+  }
+
+  /* ---- front content ---- */
+  .row-top{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+  }
+
+  .mark{
+    width:40px; height:40px;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(155deg, var(--brass-lt), var(--brass) 55%, var(--brass-dk));
+    color:#1a1408;
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:16px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.5);
+    flex-shrink:0;
+  }
+
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10px;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--grey-dim);
+    text-align:right;
+  }
+  .eyebrow span{ color:var(--brass); }
+
+  .identity{
+    margin-top:clamp(10px, 3vh, 22px);
+  }
+  .name{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:clamp(24px, 6vw, 32px);
+    line-height:1.05;
+    letter-spacing:-0.01em;
+    color:var(--paper);
+    margin:0 0 6px;
+  }
+  .role{
+    font-size:13px;
+    color:var(--grey);
+    font-weight:500;
+    margin:0;
+  }
+  .role .dot{ color:var(--brass); margin:0 6px; }
+
+  .divider{
+    height:1px;
+    background:linear-gradient(90deg, var(--line), transparent);
+    margin:16px 0;
+  }
+
+  .contact-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px 16px;
+  }
+  .contact-item{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    min-width:0;
+  }
+  .contact-item .k{
+    font-family:'JetBrains Mono', monospace;
+    font-size:9px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--grey-dim);
+  }
+  .contact-item .v{
+    font-size:12.5px;
+    color:var(--paper);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .contact-item .v a{ color:inherit; text-decoration:none; border-bottom:1px solid transparent; transition:border-color .2s; }
+  .contact-item .v a:hover{ border-color:var(--brass); }
+
+  /* ---- back content ---- */
+  .back-head{
+    display:flex; justify-content:space-between; align-items:flex-start;
+  }
+  .company-lockup{
+    font-family:'Fraunces', serif;
+    font-size:clamp(18px,4.4vw,22px);
+    color:var(--paper);
+  }
+  .company-sub{
+    font-family:'JetBrains Mono', monospace;
+    font-size:9.5px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--grey-dim);
+    margin-top:4px;
+  }
+
+  .qr-wrap{
+    display:flex; align-items:center; gap:14px;
+    margin-top:auto;
+  }
+  .qr{
+    width:64px; height:64px;
+    border-radius:8px;
+    flex-shrink:0;
+  }
+  .qr-label{
+    font-size:11.5px;
+    color:var(--grey);
+    line-height:1.4;
+    max-width:180px;
+  }
+  .qr-label strong{ color:var(--paper); font-weight:600; display:block; margin-bottom:2px; }
+
+  .addr{
+    font-size:12.5px;
+    color:var(--grey);
+    line-height:1.6;
+  }
+  .addr strong{ color:var(--paper); font-weight:500; }
+
+  .back-foot{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    font-family:'JetBrains Mono', monospace;
+    font-size:9.5px;
+    letter-spacing:0.1em;
+    color:var(--grey-dim);
+  }
+  .back-foot .brass-text{ color:var(--brass); }
+
+  /* ---- reduced motion & small screens ---- */
+  @media (prefers-reduced-motion: reduce){
+    .card-wrap{ animation:none; opacity:1; transform:none; }
+    .card{ transition:none !important; }
+    .hint{ animation:none; opacity:1; }
+  }
+
+  @media (max-width:380px){
+    .contact-grid{ grid-template-columns:1fr; }
+  }
+
+  :focus-visible{
+    outline:2px solid var(--focus);
+    outline-offset:3px;
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="card-wrap" id="cardWrap" tabindex="0" role="button" aria-label="Business card. Press Enter or click to flip." aria-pressed="false">
+    <div class="card" id="card">
+
+      <!-- FRONT -->
+      <div class="face front">
+        <div class="sheen" id="sheenFront"></div>
+        <div class="foil-line"></div>
+
+        <div class="row-top">
+          <div class="mark">M</div>
+          <div class="eyebrow">MERIDIAN <span>&amp; CO.</span></div>
+        </div>
+
+        <div class="identity">
+          <p class="name">Alexandra Reyes</p>
+          <p class="role">Director of Partnerships<span class="dot">&middot;</span>Strategy Group</p>
+        </div>
+
+        <div>
+          <div class="divider"></div>
+          <div class="contact-grid">
+            <div class="contact-item">
+              <span class="k">Email</span>
+              <span class="v"><a href="mailto:a.reyes@meridianco.com">a.reyes@meridianco.com</a></span>
+            </div>
+            <div class="contact-item">
+              <span class="k">Phone</span>
+              <span class="v"><a href="tel:+16505550142">+1 (650) 555‑0142</a></span>
+            </div>
+            <div class="contact-item">
+              <span class="k">Web</span>
+              <span class="v"><a href="https://meridianco.com" target="_blank" rel="noopener">meridianco.com</a></span>
+            </div>
+            <div class="contact-item">
+              <span class="k">Based in</span>
+              <span class="v">San Francisco, CA</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BACK -->
+      <div class="face back">
+        <div class="sheen" id="sheenBack"></div>
+        <div class="foil-line"></div>
+
+        <div class="back-head">
+          <div>
+            <div class="company-lockup">Meridian &amp; Co.</div>
+            <div class="company-sub">Strategy &amp; Partnerships</div>
+          </div>
+          <div class="mark">M</div>
+        </div>
+
+        <div class="addr">
+          <strong>Registered Office</strong>
+          148 Bryant Street, Suite 400<br>
+          San Francisco, CA 94107<br>
+          United States
+        </div>
+
+        <div class="qr-wrap">
+          <svg class="qr" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect width="100" height="100" rx="10" fill="#f4f2ec"/>
+            <g fill="#15171c">
+              <rect x="12" y="12" width="22" height="22"/><rect x="18" y="18" width="10" height="10" fill="#f4f2ec"/>
+              <rect x="66" y="12" width="22" height="22"/><rect x="72" y="18" width="10" height="10" fill="#f4f2ec"/>
+              <rect x="12" y="66" width="22" height="22"/><rect x="18" y="72" width="10" height="10" fill="#f4f2ec"/>
+              <rect x="42" y="12" width="6" height="6"/><rect x="52" y="12" width="6" height="6"/>
+              <rect x="42" y="22" width="6" height="6"/><rect x="42" y="42" width="6" height="6"/>
+              <rect x="52" y="42" width="6" height="6"/><rect x="62" y="42" width="6" height="6"/>
+              <rect x="42" y="52" width="6" height="6"/><rect x="52" y="52" width="6" height="6"/>
+              <rect x="42" y="62" width="6" height="6"/><rect x="72" y="52" width="6" height="6"/>
+              <rect x="62" y="62" width="6" height="6"/><rect x="72" y="72" width="6" height="6"/>
+              <rect x="52" y="72" width="6" height="6"/><rect x="82" y="42" width="6" height="6"/>
+              <rect x="82" y="62" width="6" height="6"/><rect x="42" y="82" width="6" height="6"/>
+              <rect x="62" y="82" width="6" height="6"/><rect x="82" y="82" width="6" height="6"/>
+            </g>
+          </svg>
+          <div class="qr-label"><strong>Save my contact</strong>Scan to add Alexandra to your address book.</div>
+        </div>
+
+        <div class="back-foot">
+          <span>EST. 2014</span>
+          <span class="brass-text">TAP TO RETURN</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <p class="hint"><kbd>hover</kbd> to tilt &nbsp;·&nbsp; <kbd>tap</kbd> to flip</p>
+</div>
+
+<script>
+(function(){
+  const wrap = document.getElementById('cardWrap');
+  const card = document.getElementById('card');
+  const sheenFront = document.getElementById('sheenFront');
+  const sheenBack = document.getElementById('sheenBack');
+  let flipped = false;
+  let rafId = null;
+  const isCoarse = window.matchMedia('(hover: none), (pointer: coarse)').matches;
+
+  function applyTilt(x, y, rect){
+    const px = (x - rect.left) / rect.width;   // 0..1
+    const py = (y - rect.top) / rect.height;   // 0..1
+    const rotY = (px - 0.5) * 16;  // left/right
+    const rotX = (0.5 - py) * 12;  // up/down
+    const baseFlip = flipped ? 180 : 0;
+
+    card.style.transform =
+      `rotateY(${baseFlip + (flipped ? -rotY : rotY)}deg) rotateX(${rotX}deg)`;
+
+    const mx = (px * 100).toFixed(1) + '%';
+    const my = (py * 100).toFixed(1) + '%';
+    sheenFront.style.setProperty('--mx', mx);
+    sheenFront.style.setProperty('--my', my);
+    sheenBack.style.setProperty('--mx', mx);
+    sheenBack.style.setProperty('--my', my);
+  }
+
+  function resetTilt(){
+    card.style.transform = `rotateY(${flipped ? 180 : 0}deg) rotateX(0deg)`;
+  }
+
+  if(!isCoarse){
+    wrap.addEventListener('mousemove', (e)=>{
+      const rect = wrap.getBoundingClientRect();
+      if(rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(()=> applyTilt(e.clientX, e.clientY, rect));
+    });
+    wrap.addEventListener('mouseleave', ()=>{
+      card.classList.add('flipping');
+      resetTilt();
+      setTimeout(()=> card.classList.remove('flipping'), 700);
+    });
+  }
+
+  function doFlip(){
+    flipped = !flipped;
+    card.classList.add('flipping');
+    card.style.transform = `rotateY(${flipped ? 180 : 0}deg) rotateX(0deg)`;
+    wrap.setAttribute('aria-pressed', String(flipped));
+    setTimeout(()=> card.classList.remove('flipping'), 700);
+  }
+
+  wrap.addEventListener('click', doFlip);
+  wrap.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter' || e.key === ' '){
+      e.preventDefault();
+      doFlip();
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
