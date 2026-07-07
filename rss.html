@@ -1,767 +1,818 @@
 <!doctype html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
     <title>Card — RSS Rewinding Service Solution</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
-      rel="stylesheet"
-    />
+        href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet" />
     <style>
-      :root {
-        --ink: #0b0c10;
-        --plate: #15171c;
-        --plate-2: #1c1f26;
-        --line: #2b2e36;
-        --paper: #f4f2ec;
-        --paper-dim: #9a9da6;
-        --grey: #8b8d93;
-        --grey-dim: #55575e;
-        --brass: #c3a15a;
-        --brass-lt: #f0dca0;
-        --brass-dk: #8a6d33;
-        --focus: #e4c989;
-        --radius: 20px;
-      }
-
-      * {
-        box-sizing: border-box;
-      }
-
-      html,
-      body {
-        height: 100%;
-      }
-
-      body {
-        margin: 0;
-        min-height: 100dvh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background:
-          radial-gradient(
-            ellipse 120% 80% at 50% -10%,
-            #1a1c22 0%,
-            var(--ink) 55%
-          ),
-          var(--ink);
-        font-family: "Inter", sans-serif;
-        color: var(--paper);
-        overflow-x: hidden;
-        padding: 32px 20px;
-      }
-
-      body::before {
-        content: "";
-        position: fixed;
-        inset: 0;
-        background: radial-gradient(
-          circle at 50% 40%,
-          transparent 0%,
-          rgba(0, 0, 0, 0.55) 100%
-        );
-        pointer-events: none;
-        z-index: 0;
-      }
-
-      .stage {
-        position: relative;
-        width: 100%;
-        max-width: 340px;
-        perspective: 1600px;
-        z-index: 1;
-      }
-
-      .hint {
-        text-align: center;
-        font-family: "JetBrains Mono", monospace;
-        font-size: 11px;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-        color: var(--grey-dim);
-        margin-top: 26px;
-        opacity: 0;
-        animation: fadeIn 0.8s ease 1.4s forwards;
-        user-select: none;
-      }
-
-      .hint kbd {
-        display: inline-block;
-        border: 1px solid var(--line);
-        border-radius: 4px;
-        padding: 1px 6px;
-        font-family: inherit;
-        color: var(--grey);
-        margin: 0 2px;
-      }
-
-      .card-wrap {
-        width: 100%;
-        aspect-ratio: 0.62 / 1;
-        max-height: 82vh;
-        position: relative;
-        transform-style: preserve-3d;
-        cursor: pointer;
-        opacity: 0;
-        transform: translateY(28px) scale(0.96);
-        animation: riseIn 0.9s cubic-bezier(0.16, 0.9, 0.28, 1) 0.15s forwards;
-      }
-
-      @keyframes riseIn {
-        to {
-          opacity: 1;
-          transform: translateY(0) scale(1);
-        }
-      }
-
-      @keyframes fadeIn {
-        to {
-          opacity: 1;
-        }
-      }
-
-      .card {
-        position: absolute;
-        inset: 0;
-        border-radius: var(--radius);
-        transform-style: preserve-3d;
-        transition: transform 0.15s ease-out;
-        will-change: transform;
-      }
-
-      .card.flipping {
-        transition: transform 0.7s cubic-bezier(0.4, 0.1, 0.2, 1);
-      }
-
-      .face {
-        position: absolute;
-        inset: 0;
-        border-radius: var(--radius);
-        backface-visibility: hidden;
-        -webkit-backface-visibility: hidden;
-        background: linear-gradient(
-          165deg,
-          var(--plate-2) 0%,
-          var(--plate) 45%,
-          #101217 100%
-        );
-        border: 1px solid var(--line);
-        box-shadow:
-          0 30px 60px -20px rgba(0, 0, 0, 0.65),
-          0 8px 20px -8px rgba(0, 0, 0, 0.5),
-          inset 0 1px 0 rgba(255, 255, 255, 0.04);
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        padding: clamp(22px, 6vw, 32px) clamp(20px, 5.5vw, 28px);
-      }
-
-      .face.back {
-        transform: rotateY(180deg);
-      }
-
-      .sheen {
-        position: absolute;
-        inset: -2px;
-        background: radial-gradient(
-          360px circle at var(--mx, 50%) var(--my, 20%),
-          rgba(240, 220, 160, 0.16),
-          rgba(240, 220, 160, 0.05) 32%,
-          transparent 60%
-        );
-        mix-blend-mode: screen;
-        pointer-events: none;
-        transition: opacity 0.4s ease;
-      }
-
-      .foil-line {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 3px;
-        background: linear-gradient(
-          90deg,
-          transparent,
-          var(--brass-lt),
-          var(--brass),
-          transparent
-        );
-        opacity: 0.9;
-      }
-
-      .row-top {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-      }
-
-      .logo {
-        width: 110px;
-        height: 110px;
-        border-radius: 50%;
-        overflow: hidden;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: #fff;
-        /* Optional */
-        border: 3px solid var(--brass);
-        /* Optional gold border */
-        flex-shrink: 0;
-      }
-
-      .logo img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        /* Fill the circle */
-      }
-
-      .mark {
-        width: 44px;
-        height: 44px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: linear-gradient(
-          155deg,
-          var(--brass-lt),
-          var(--brass) 55%,
-          var(--brass-dk)
-        );
-        color: #1a1408;
-        font-family: "Fraunces", serif;
-        font-weight: 600;
-        font-size: 16px;
-        box-shadow:
-          0 2px 8px rgba(0, 0, 0, 0.4),
-          inset 0 1px 1px rgba(255, 255, 255, 0.5);
-        flex-shrink: 0;
-      }
-
-      .eyebrow {
-        font-family: "JetBrains Mono", monospace;
-        font-size: 9.5px;
-        letter-spacing: 0.16em;
-        text-transform: uppercase;
-        color: var(--grey-dim);
-        text-align: right;
-        line-height: 1.5;
-      }
-
-      .eyebrow span {
-        color: var(--brass);
-      }
-
-      .identity-block {
-        margin: clamp(14px, 4vh, 26px) 0 0;
-      }
-
-      .name {
-        font-family: "Fraunces", serif;
-        font-weight: 650;
-        font-size: clamp(28px, 8.6vw, 36px);
-        line-height: 1.1;
-        letter-spacing: -0.01em;
-        margin: 0 0 10px;
-        background: linear-gradient(
-          100deg,
-          var(--brass-lt) 0%,
-          var(--brass) 45%,
-          var(--brass-dk) 100%
-        );
-        -webkit-background-clip: text;
-        background-clip: text;
-        -webkit-text-fill-color: transparent;
-        color: var(--brass);
-        text-shadow: 0 2px 18px rgba(195, 161, 90, 0.35);
-      }
-
-      .role {
-        font-size: clamp(11px, 2.8vw, 12.5px);
-        color: var(--brass-lt);
-        font-weight: 600;
-        margin: 0;
-        line-height: 1.5;
-        letter-spacing: 0.04em;
-        text-transform: uppercase;
-      }
-
-      .divider {
-        height: 1px;
-        background: linear-gradient(90deg, var(--line), transparent);
-        margin: 16px 0;
-      }
-
-      .contact-grid {
-        display: flex;
-        flex-direction: column;
-        gap: clamp(8px, 1.8vh, 12px);
-      }
-
-      .contact-item {
-        display: flex;
-        flex-direction: column;
-        gap: 3px;
-        min-width: 0;
-      }
-
-      .contact-item .k {
-        font-family: "JetBrains Mono", monospace;
-        font-size: 9px;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        color: var(--grey-dim);
-      }
-
-      .contact-item .k.person-name {
-        font-family: "Fraunces", serif;
-        font-size: 15px;
-        font-weight: 650;
-        letter-spacing: 0;
-        text-transform: none;
-        background: linear-gradient(
-          100deg,
-          var(--brass-lt) 0%,
-          var(--brass) 55%,
-          var(--brass-dk) 100%
-        );
-        -webkit-background-clip: text;
-        background-clip: text;
-        -webkit-text-fill-color: transparent;
-        color: var(--brass);
-      }
-
-      .contact-item .v {
-        font-size: 12.5px;
-        color: var(--paper);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      .contact-item .v a {
-        color: inherit;
-        text-decoration: none;
-        border-bottom: 1px solid transparent;
-        transition: border-color 0.2s;
-      }
-
-      .contact-item .v a:hover {
-        border-color: var(--brass);
-      }
-
-      .back-head {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-      }
-
-      .company-lockup {
-        font-family: "Fraunces", serif;
-        font-weight: 650;
-        font-size: clamp(20px, 6vw, 23px);
-        line-height: 1.18;
-        background: linear-gradient(
-          100deg,
-          var(--brass-lt) 0%,
-          var(--brass) 45%,
-          var(--brass-dk) 100%
-        );
-        -webkit-background-clip: text;
-        background-clip: text;
-        -webkit-text-fill-color: transparent;
-        color: var(--brass);
-      }
-
-      .company-sub {
-        font-family: "JetBrains Mono", monospace;
-        font-size: 9px;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        color: var(--grey-dim);
-        margin-top: 4px;
-      }
-
-      .services-block {
-        margin: clamp(10px, 2.4vh, 16px) 0;
-      }
-
-      .services-title {
-        font-family: "JetBrains Mono", monospace;
-        font-size: 9.5px;
-        letter-spacing: 0.16em;
-        text-transform: uppercase;
-        color: var(--brass);
-        margin: 0 0 10px;
-      }
-
-      .services-list {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-      }
-
-      .services-list li {
-        font-size: 10px;
-        line-height: 1.3;
-        color: var(--paper-dim);
-        padding-left: 12px;
-        position: relative;
-      }
-
-      .services-list li::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 5px;
-        width: 5px;
-        height: 5px;
-        border-radius: 50%;
-        background: var(--brass);
-      }
-
-      .map-embed {
-        position: relative;
-        width: 100%;
-        height: 170px; /* Increased from 100px */
-        border-radius: 16px;
-        overflow: hidden;
-        border: 2px solid rgba(195, 161, 90, 0.3);
-        margin: 12px 0;
-        box-shadow:
-          0 8px 20px rgba(0, 0, 0, 0.35),
-          inset 0 1px 0 rgba(255, 255, 255, 0.08);
-        transition: all 0.35s ease;
-      }
-
-      .map-embed:hover {
-        transform: translateY(-3px);
-        box-shadow:
-          0 14px 30px rgba(0, 0, 0, 0.45),
-          0 0 20px rgba(195, 161, 90, 0.25);
-      }
-
-      .map-embed iframe {
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        border: none;
-        transition: transform 0.4s ease;
-      }
-
-      .map-embed:hover iframe {
-        transform: scale(1.03);
-      }
-
-      .map-embed::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(
-          to top,
-          rgba(0, 0, 0, 0.25),
-          transparent 35%
-        );
-        pointer-events: none;
-      }
-
-      .map-embed-label {
-        position: absolute;
-        right: 12px;
-        bottom: 12px;
-        font-family: "JetBrains Mono", monospace;
-        font-size: 10px;
-        font-weight: 600;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        color: #fff;
-        background: rgba(31, 78, 140, 0.9);
-        backdrop-filter: blur(8px);
-        padding: 7px 12px;
-        border-radius: 20px;
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        pointer-events: none;
-      }
-
-      .addr {
-        font-size: 11px;
-        color: var(--grey);
-        line-height: 1.55;
-        text-align: center;
-        padding: 10px 0;
-        /* 10px top and bottom */
-      }
-
-      .addr strong {
-        color: var(--paper);
-        font-weight: 500;
-        display: block;
-        margin-bottom: 3px;
-      }
-
-      .back-foot {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
-        font-family: "JetBrains Mono", monospace;
-        font-size: 9px;
-        letter-spacing: 0.1em;
-        color: var(--grey-dim);
-      }
-
-      .back-foot .brass-text {
-        color: var(--brass);
-      }
-
-      .back-foot a {
-        color: var(--grey-dim);
-        text-decoration: none;
-      }
-
-      .back-foot a:hover {
-        color: var(--brass);
-      }
-
-      @media (prefers-reduced-motion: reduce) {
-        .card-wrap {
-          animation: none;
-          opacity: 1;
-          transform: none;
+        :root {
+            --ink: #0b0c10;
+            --plate: #15171c;
+            --plate-2: #1c1f26;
+            --line: #2b2e36;
+            --paper: #f4f2ec;
+            --paper-dim: #9a9da6;
+            --grey: #8b8d93;
+            --grey-dim: #55575e;
+            --brass: #c3a15a;
+            --brass-lt: #f0dca0;
+            --brass-dk: #8a6d33;
+            --focus: #e4c989;
+            --radius: 20px;
         }
 
-        .card {
-          transition: none !important;
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100dvh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background:
+                radial-gradient(ellipse 120% 80% at 50% -10%,
+                    #1a1c22 0%,
+                    var(--ink) 55%),
+                var(--ink);
+            font-family: "Inter", sans-serif;
+            color: var(--paper);
+            overflow-x: hidden;
+            padding: 32px 20px;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at 50% 40%,
+                    transparent 0%,
+                    rgba(0, 0, 0, 0.55) 100%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .stage {
+            position: relative;
+            width: 100%;
+            max-width: 340px;
+            perspective: 1600px;
+            z-index: 1;
         }
 
         .hint {
-          animation: none;
-          opacity: 1;
+            text-align: center;
+            font-family: "JetBrains Mono", monospace;
+            font-size: 11px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--grey-dim);
+            margin-top: 26px;
+            opacity: 0;
+            animation: fadeIn 0.8s ease 1.4s forwards;
+            user-select: none;
         }
-      }
 
-      @media (max-width: 380px) {
+        .hint kbd {
+            display: inline-block;
+            border: 1px solid var(--line);
+            border-radius: 4px;
+            padding: 1px 6px;
+            font-family: inherit;
+            color: var(--grey);
+            margin: 0 2px;
+        }
+
         .card-wrap {
-          aspect-ratio: 0.58 / 1;
+            width: 100%;
+            aspect-ratio: 0.62 / 1;
+            max-height: 82vh;
+            position: relative;
+            transform-style: preserve-3d;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(28px) scale(0.96);
+            animation: riseIn 0.9s cubic-bezier(0.16, 0.9, 0.28, 1) 0.15s forwards;
         }
-      }
 
-      :focus-visible {
-        outline: 2px solid var(--focus);
-        outline-offset: 3px;
-      }
+        @keyframes riseIn {
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        .card {
+            position: absolute;
+            inset: 0;
+            border-radius: var(--radius);
+            transform-style: preserve-3d;
+            transition: transform 0.15s ease-out;
+            will-change: transform;
+        }
+
+        .card.flipping {
+            transition: transform 0.7s cubic-bezier(0.4, 0.1, 0.2, 1);
+        }
+
+        .face {
+            position: absolute;
+            inset: 0;
+            border-radius: var(--radius);
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+
+            display: flex;
+            flex-direction: column;
+
+            gap: 05px;
+
+            padding: 24px;
+
+            overflow: hidden;
+
+            background: linear-gradient(165deg,
+                    var(--plate-2),
+                    var(--plate),
+                    #101217);
+
+            border: 1px solid var(--line);
+
+            box-shadow:
+                0 30px 60px -20px rgba(0, 0, 0, .65),
+                0 8px 20px -8px rgba(0, 0, 0, .5),
+                inset 0 1px 0 rgba(255, 255, 255, .04);
+        }
+
+        .face.back {
+            transform: rotateY(180deg);
+        }
+
+        .sheen {
+            position: absolute;
+            inset: -2px;
+            background: radial-gradient(360px circle at var(--mx, 50%) var(--my, 20%),
+                    rgba(240, 220, 160, 0.16),
+                    rgba(240, 220, 160, 0.05) 32%,
+                    transparent 60%);
+            mix-blend-mode: screen;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .foil-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg,
+                    transparent,
+                    var(--brass-lt),
+                    var(--brass),
+                    transparent);
+            opacity: 0.9;
+        }
+
+        .row-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+        }
+
+        .logo {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+            /* Optional */
+            border: 3px solid var(--brass);
+            /* Optional gold border */
+            flex-shrink: 0;
+        }
+
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* Fill the circle */
+        }
+
+        .mark {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(155deg,
+                    var(--brass-lt),
+                    var(--brass) 55%,
+                    var(--brass-dk));
+            color: #1a1408;
+            font-family: "Fraunces", serif;
+            font-weight: 600;
+            font-size: 16px;
+            box-shadow:
+                0 2px 8px rgba(0, 0, 0, 0.4),
+                inset 0 1px 1px rgba(255, 255, 255, 0.5);
+            flex-shrink: 0;
+        }
+
+        .eyebrow {
+            font-family: "JetBrains Mono", monospace;
+            font-size: 9.5px;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--grey-dim);
+            text-align: right;
+            line-height: 1.5;
+        }
+
+        .eyebrow span {
+            color: var(--brass);
+        }
+
+        .identity-block {
+            margin: 18px 0;
+        }
+
+        .company-tag {
+            display: inline-block;
+            font-family: "JetBrains Mono", monospace;
+            font-size: 10px;
+            letter-spacing: .22em;
+            text-transform: uppercase;
+            color: var(--brass);
+            margin-bottom: 10px;
+        }
+
+        .name {
+            margin: 0;
+            font-family: "Fraunces", serif;
+            font-size: 42px;
+            font-weight: 700;
+            line-height: 1;
+            letter-spacing: -1px;
+
+            background: linear-gradient(100deg,
+                    var(--brass-lt),
+                    var(--brass),
+                    var(--brass-dk));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .name span {
+            display: block;
+            margin-top: 6px;
+            font-size: 18px;
+            font-weight: 500;
+            letter-spacing: .02em;
+            line-height: 1.2;
+        }
+
+        .title-divider {
+            width: 90px;
+            height: 3px;
+            margin: 10px 0 16px;
+            border-radius: 50px;
+
+            background: linear-gradient(90deg,
+                    var(--brass-lt) 0%,
+                    var(--brass) 45%,
+                    rgba(195, 161, 90, .15) 100%);
+        }
+
+        .role {
+            margin: 0;
+            font-size: 10px;
+            font-weight: 600;
+            line-height: 1.45;
+            color: var(--paper-dim);
+
+            text-transform: uppercase;
+            letter-spacing: .04em;
+
+            max-width: 280px;
+        }
+
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, var(--line), transparent);
+            margin: 16px 0;
+        }
+
+        .contact-grid {
+            display: flex;
+            flex-direction: column;
+            gap: clamp(8px, 1.8vh, 12px);
+        }
+
+        .contact-item {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            min-width: 0;
+        }
+
+        .contact-item .k {
+            font-family: "JetBrains Mono", monospace;
+            font-size: 9px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--grey-dim);
+        }
+
+        .contact-item .k.person-name {
+            font-family: "Fraunces", serif;
+            font-size: 15px;
+            font-weight: 650;
+            letter-spacing: 0;
+            text-transform: none;
+            background: linear-gradient(100deg,
+                    var(--brass-lt) 0%,
+                    var(--brass) 55%,
+                    var(--brass-dk) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: var(--brass);
+        }
+
+        .contact-item .v {
+            font-size: 12.5px;
+            color: var(--paper);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .contact-item .v a {
+            color: inherit;
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        .contact-item .v a:hover {
+            border-color: var(--brass);
+        }
+
+        .back-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .back-logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+
+            border: 3px solid var(--brass);
+
+            box-shadow:
+                0 8px 20px rgba(0, 0, 0, 0.25),
+                inset 0 1px 2px rgba(255, 255, 255, 0.8);
+
+            transition: 0.3s ease;
+        }
+
+        .back-logo img {
+            width: 105%;
+            height: 105%;
+            object-fit: contain;
+        }
+
+        .back-logo:hover {
+            transform: scale(1.06);
+            box-shadow:
+                0 12px 28px rgba(0, 0, 0, 0.35),
+                0 0 18px rgba(195, 161, 90, 0.35);
+        }
+
+        .company-lockup {
+            font-family: "Fraunces", serif;
+            font-weight: 650;
+            font-size: 26px;
+            line-height: 1.15;
+            background: linear-gradient(100deg,
+                    var(--brass-lt) 0%,
+                    var(--brass) 45%,
+                    var(--brass-dk) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .company-lockup span {
+            display: block;
+            font-size: 15px;
+            /* Smaller */
+            font-weight: 600;
+            line-height: 1.2;
+            letter-spacing: 0;
+        }
+
+        .company-sub {
+            font-family: "JetBrains Mono", monospace;
+            font-size: 9px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--grey-dim);
+            margin-top: 4px;
+        }
+
+        .services-block {
+            margin: clamp(10px, 2.4vh, 16px) 0;
+        }
+
+        .services-title {
+            font-family: "JetBrains Mono", monospace;
+            font-size: 9.5px;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--brass);
+            margin: 0 0 10px;
+        }
+
+        .services-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .services-list li {
+            font-size: 10px;
+            line-height: 1.3;
+            color: var(--paper-dim);
+            padding-left: 12px;
+            position: relative;
+        }
+
+        .services-list li::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 5px;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--brass);
+        }
+
+        .map-embed {
+            position: relative;
+            width: 100%;
+            height: 170px;
+            /* Increased from 100px */
+            border-radius: 16px;
+            overflow: hidden;
+            border: 2px solid rgba(195, 161, 90, 0.3);
+            margin: 12px 0;
+            box-shadow:
+                0 8px 20px rgba(0, 0, 0, 0.35),
+                inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            transition: all 0.35s ease;
+        }
+
+        .map-embed:hover {
+            transform: translateY(-3px);
+            box-shadow:
+                0 14px 30px rgba(0, 0, 0, 0.45),
+                0 0 20px rgba(195, 161, 90, 0.25);
+        }
+
+        .map-embed iframe {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            transition: transform 0.4s ease;
+        }
+
+        .map-embed:hover iframe {
+            transform: scale(1.03);
+        }
+
+        .map-embed::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top,
+                    rgba(0, 0, 0, 0.25),
+                    transparent 35%);
+            pointer-events: none;
+        }
+
+        .map-embed-label {
+            position: absolute;
+            right: 12px;
+            bottom: 12px;
+            font-family: "JetBrains Mono", monospace;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #fff;
+            background: rgba(31, 78, 140, 0.9);
+            backdrop-filter: blur(8px);
+            padding: 7px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            pointer-events: none;
+        }
+
+        .addr {
+            font-size: 11px;
+            color: var(--grey);
+            line-height: 1.55;
+            text-align: center;
+            padding: 10px 0;
+            /* 10px top and bottom */
+        }
+
+        .addr strong {
+            color: var(--paper);
+            font-weight: 500;
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        .back-foot {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            font-family: "JetBrains Mono", monospace;
+            font-size: 9px;
+            letter-spacing: 0.1em;
+            color: var(--grey-dim);
+        }
+
+        .back-foot .brass-text {
+            color: var(--brass);
+        }
+
+        .back-foot a {
+            color: var(--grey-dim);
+            text-decoration: none;
+        }
+
+        .back-foot a:hover {
+            color: var(--brass);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .card-wrap {
+                animation: none;
+                opacity: 1;
+                transform: none;
+            }
+
+            .card {
+                transition: none !important;
+            }
+
+            .hint {
+                animation: none;
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .card-wrap {
+                aspect-ratio: 0.58 / 1;
+            }
+        }
+
+        :focus-visible {
+            outline: 2px solid var(--focus);
+            outline-offset: 3px;
+        }
     </style>
-  </head>
+</head>
 
-  <body>
+<body>
     <div class="stage">
-      <div
-        class="card-wrap"
-        id="cardWrap"
-        tabindex="0"
-        role="button"
-        aria-label="Business card. Press Enter or click to flip."
-        aria-pressed="false"
-      >
-        <div class="card" id="card">
-          <!-- FRONT -->
-          <div class="face front">
-            <div class="sheen" id="sheenFront"></div>
-            <div class="foil-line"></div>
+        <div class="card-wrap" id="cardWrap" tabindex="0" role="button"
+            aria-label="Business card. Press Enter or click to flip." aria-pressed="false">
+            <div class="card" id="card">
+                <!-- FRONT -->
+                <div class="face front">
+                    <div class="sheen" id="sheenFront"></div>
+                    <div class="foil-line"></div>
 
-            <div class="row-top">
-              <div class="logo">
-                <img src="logo.jpg" alt="RSS Logo" />
-              </div>
-              <div class="eyebrow">
-                REWINDING SERVICE<br /><span>SOLUTION</span>
-              </div>
-            </div>
+                    <div class="row-top">
+                        <div class="logo">
+                            <img src="logo.jpg" alt="RSS Logo" />
+                        </div>
+                        <div class="eyebrow">
+                            REWINDING SERVICE <br /><span>& SOLUTION</span>
+                        </div>
+                    </div>
 
-            <div class="identity-block">
-              <p class="name">RSS Rewinding<br />Service Solution</p>
-              <p class="role">Trusted by Industries, Driven by Expertise</p>
-            </div>
+                    <div class="identity-block">
 
-            <div>
-              <div class="divider"></div>
-              <div class="contact-grid">
-                <div class="contact-item">
-                  <span class="k person-name">Mr. Gaurav Deshpande</span>
-                  <span class="v"
-                    ><a href="tel:+917874775520">M.: 78747 75520</a></span
-                  >
+                        <span class="company-tag">INDUSTRIAL MOTOR SPECIALISTS</span>
+
+                        <h1 class="name">
+                            RSS
+                            <span>Rewinding Service Solution</span>
+                        </h1>
+
+                        <div class="title-divider"></div>
+
+                        <p class="role">
+                            Trusted by Industries • Driven by Expertise
+                        </p>
+
+                    </div>
+
+                    <div>
+                        <div class="divider"></div>
+                        <div class="contact-grid">
+                            <div class="contact-item">
+                                <span class="k person-name">Mr. Gaurav Deshpande</span>
+                                <span class="v"><a href="tel:+917874775520">M.: 78747 75520</a></span>
+                            </div>
+                            <div class="contact-item">
+                                <span class="k person-name">Mr. Rajendra Rathod</span>
+                                <span class="v"><a href="tel:+917069980600">M.: 70699 80600</a></span>
+                            </div>
+                            <div class="contact-item">
+                                <span class="k">Email</span>
+                                <span class="v"><a href="mailto:info@rssrewinding.com">info@rssrewinding.com</a></span>
+                            </div>
+                            <div class="contact-item">
+                                <span class="k">Web</span>
+                                <span class="v"><a href="https://www.rssrewinding.com" target="_blank"
+                                        rel="noopener">www.rssrewinding.com</a></span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="contact-item">
-                  <span class="k person-name">Mr. Rajendra Rathod</span>
-                  <span class="v"
-                    ><a href="tel:+917069980600">M.: 70699 80600</a></span
-                  >
-                </div>
-                <div class="contact-item">
-                  <span class="k">Email</span>
-                  <span class="v"
-                    ><a href="mailto:info@rssrewinding.com"
-                      >info@rssrewinding.com</a
-                    ></span
-                  >
-                </div>
-                <div class="contact-item">
-                  <span class="k">Web</span>
-                  <span class="v"
-                    ><a
-                      href="https://www.rssrewinding.com"
-                      target="_blank"
-                      rel="noopener"
-                      >www.rssrewinding.com</a
-                    ></span
-                  >
-                </div>
-              </div>
-            </div>
-          </div>
 
-          <!-- BACK -->
-          <div class="face back">
-            <div class="sheen" id="sheenBack"></div>
-            <div class="foil-line"></div>
+                <!-- BACK -->
+                <div class="face back">
+                    <div class="sheen" id="sheenBack"></div>
+                    <div class="foil-line"></div>
 
-            <div class="back-head">
-              <div>
-                <div class="company-lockup">
-                  RSS Rewinding<br />Service Solution
+                    <div class="back-head">
+                        <div>
+                            <div class="company-lockup">
+                                RSS <br />
+                                <span>Rewinding Service Solution</span>
+                            </div>
+
+                            <div class="company-sub">INDUSTRIAL MOTOR SPECIALISTS</div>
+                        </div>
+                        <div class="back-logo">
+                            <img src="logo.jpg" alt="RSS Rewinding Service Solution" />
+                        </div>
+                    </div>
+
+                    <div class="services-block">
+                        <p class="services-title">Our Services</p>
+                        <ul class="services-list">
+                            <li>3Ph &amp; 1Ph Induction Motor Rewinding</li>
+                            <li>AC Generator/Alternator Rewinding</li>
+                            <li>3Ph &amp; 1Ph Submersible Pump Rewinding</li>
+                            <li>
+                                Hiring of Power Tools like Grinder &amp; Drilling Machine
+                            </li>
+                            <li>Supply of New Induction Motor</li>
+                            <li>Onsite Motor Inspection</li>
+                            <li>Emergency Breakdown Service</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <div class="divider"></div>
+                        <div class="map-embed">
+                            <iframe
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3691.5289674523124!2d73.22613171159875!3d22.29582597960497!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x395fc5827a986d63%3A0x74d69cfa0813fa25!2sJay%20Ranchhod%20Complex%2C%20C%2F21%2C%20Society%202%2C%20Aadhar%20Society%2C%20Waghodia%2C%20Vadodara%2C%20Gujarat%20390019!5e0!3m2!1sen!2sin!4v1783432818282!5m2!1sen!2sin"
+                                loading="lazy" referrerpolicy="strict-origin-when-cross-origin"
+                                title="RSS Rewinding Service Solution location on Google Maps"></iframe>
+                            <!-- <span class="map-embed-label">Tap to open map</span> -->
+                        </div>
+                        <div class="addr">
+                            <!-- <strong>Registered Office</strong> -->
+                            Jay Ranchod Complex, Post - Manjusar,<br />
+                            Taluka - Savli, District Vadodara - 391775
+                        </div>
+                    </div>
+
+                    <div class="back-foot">
+                        <a href="mailto:info@rssrewinding.com">info@rssrewinding.com</a>
+                        <span class="brass-text">TAP TO RETURN</span>
+                    </div>
                 </div>
-                <div class="company-sub">
-                  Industrial Motors &amp; AC Generator
-                </div>
-              </div>
-              <div class="mark">RSS</div>
             </div>
-
-            <div class="services-block">
-              <p class="services-title">Our Services</p>
-              <ul class="services-list">
-                <li>3Ph &amp; 1Ph Induction Motor Rewinding</li>
-                <li>AC Generator/Alternator Rewinding</li>
-                <li>3Ph &amp; 1Ph Submersible Pump Rewinding</li>
-                <li>
-                  Hiring of Power Tools like Grinder &amp; Drilling Machine
-                </li>
-                <li>Supply of New Induction Motor</li>
-                <li>Onsite Motor Inspection</li>
-                <li>Emergency Breakdown Service</li>
-              </ul>
-            </div>
-
-            <div>
-              <div class="divider"></div>
-              <div class="map-embed">
-                <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3691.5289674523124!2d73.22613171159875!3d22.29582597960497!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x395fc5827a986d63%3A0x74d69cfa0813fa25!2sJay%20Ranchhod%20Complex%2C%20C%2F21%2C%20Society%202%2C%20Aadhar%20Society%2C%20Waghodia%2C%20Vadodara%2C%20Gujarat%20390019!5e0!3m2!1sen!2sin!4v1783432818282!5m2!1sen!2sin"
-                  loading="lazy"
-                  referrerpolicy="strict-origin-when-cross-origin"
-                  title="RSS Rewinding Service Solution location on Google Maps"
-                ></iframe>
-                <!-- <span class="map-embed-label">Tap to open map</span> -->
-              </div>
-              <div class="addr">
-                <!-- <strong>Registered Office</strong> -->
-                Jay Ranchod Complex, Post - Manjusar,<br />
-                Taluka - Savli, District Vadodara - 391775
-              </div>
-            </div>
-
-            <div class="back-foot">
-              <a href="mailto:info@rssrewinding.com">info@rssrewinding.com</a>
-              <span class="brass-text">TAP TO RETURN</span>
-            </div>
-          </div>
         </div>
-      </div>
 
-      <p class="hint">
-        <kbd>hover</kbd> to tilt &nbsp;·&nbsp; <kbd>tap</kbd> to flip
-      </p>
+        <p class="hint">
+            <kbd>hover</kbd> to tilt &nbsp;·&nbsp; <kbd>tap</kbd> to flip
+        </p>
     </div>
 
     <script>
-      (function () {
-        const wrap = document.getElementById("cardWrap");
-        const card = document.getElementById("card");
-        const sheenFront = document.getElementById("sheenFront");
-        const sheenBack = document.getElementById("sheenBack");
-        let flipped = false;
-        let rafId = null;
-        const isCoarse = window.matchMedia(
-          "(hover: none), (pointer: coarse)",
-        ).matches;
+        (function () {
+            const wrap = document.getElementById("cardWrap");
+            const card = document.getElementById("card");
+            const sheenFront = document.getElementById("sheenFront");
+            const sheenBack = document.getElementById("sheenBack");
+            let flipped = false;
+            let rafId = null;
+            const isCoarse = window.matchMedia(
+                "(hover: none), (pointer: coarse)",
+            ).matches;
 
-        function applyTilt(x, y, rect) {
-          const px = (x - rect.left) / rect.width;
-          const py = (y - rect.top) / rect.height;
-          const rotY = (px - 0.5) * 14;
-          const rotX = (0.5 - py) * 10;
-          const baseFlip = flipped ? 180 : 0;
+            function applyTilt(x, y, rect) {
+                const px = (x - rect.left) / rect.width;
+                const py = (y - rect.top) / rect.height;
+                const rotY = (px - 0.5) * 14;
+                const rotX = (0.5 - py) * 10;
+                const baseFlip = flipped ? 180 : 0;
 
-          card.style.transform = `rotateY(${baseFlip + (flipped ? -rotY : rotY)}deg) rotateX(${rotX}deg)`;
+                card.style.transform = `rotateY(${baseFlip + (flipped ? -rotY : rotY)}deg) rotateX(${rotX}deg)`;
 
-          const mx = (px * 100).toFixed(1) + "%";
-          const my = (py * 100).toFixed(1) + "%";
-          sheenFront.style.setProperty("--mx", mx);
-          sheenFront.style.setProperty("--my", my);
-          sheenBack.style.setProperty("--mx", mx);
-          sheenBack.style.setProperty("--my", my);
-        }
+                const mx = (px * 100).toFixed(1) + "%";
+                const my = (py * 100).toFixed(1) + "%";
+                sheenFront.style.setProperty("--mx", mx);
+                sheenFront.style.setProperty("--my", my);
+                sheenBack.style.setProperty("--mx", mx);
+                sheenBack.style.setProperty("--my", my);
+            }
 
-        function resetTilt() {
-          card.style.transform = `rotateY(${flipped ? 180 : 0}deg) rotateX(0deg)`;
-        }
+            function resetTilt() {
+                card.style.transform = `rotateY(${flipped ? 180 : 0}deg) rotateX(0deg)`;
+            }
 
-        if (!isCoarse) {
-          wrap.addEventListener("mousemove", (e) => {
-            const rect = wrap.getBoundingClientRect();
-            if (rafId) cancelAnimationFrame(rafId);
-            rafId = requestAnimationFrame(() =>
-              applyTilt(e.clientX, e.clientY, rect),
-            );
-          });
-          wrap.addEventListener("mouseleave", () => {
-            card.classList.add("flipping");
-            resetTilt();
-            setTimeout(() => card.classList.remove("flipping"), 700);
-          });
-        }
+            if (!isCoarse) {
+                wrap.addEventListener("mousemove", (e) => {
+                    const rect = wrap.getBoundingClientRect();
+                    if (rafId) cancelAnimationFrame(rafId);
+                    rafId = requestAnimationFrame(() =>
+                        applyTilt(e.clientX, e.clientY, rect),
+                    );
+                });
+                wrap.addEventListener("mouseleave", () => {
+                    card.classList.add("flipping");
+                    resetTilt();
+                    setTimeout(() => card.classList.remove("flipping"), 700);
+                });
+            }
 
-        function doFlip() {
-          flipped = !flipped;
-          card.classList.add("flipping");
-          card.style.transform = `rotateY(${flipped ? 180 : 0}deg) rotateX(0deg)`;
-          wrap.setAttribute("aria-pressed", String(flipped));
-          setTimeout(() => card.classList.remove("flipping"), 700);
-        }
+            function doFlip() {
+                flipped = !flipped;
+                card.classList.add("flipping");
+                card.style.transform = `rotateY(${flipped ? 180 : 0}deg) rotateX(0deg)`;
+                wrap.setAttribute("aria-pressed", String(flipped));
+                setTimeout(() => card.classList.remove("flipping"), 700);
+            }
 
-        wrap.addEventListener("click", doFlip);
-        wrap.addEventListener("keydown", (e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            doFlip();
-          }
-        });
-      })();
+            wrap.addEventListener("click", doFlip);
+            wrap.addEventListener("keydown", (e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    doFlip();
+                }
+            });
+        })();
     </script>
-  </body>
+</body>
+
 </html>
