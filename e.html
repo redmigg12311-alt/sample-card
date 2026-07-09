@@ -58,6 +58,7 @@
             width: 100%;
             max-width: 330px;
             perspective: 1700px;
+            -webkit-perspective: 1700px;
         }
 
         .card-wrap {
@@ -66,6 +67,7 @@
             max-height: 80vh;
             position: relative;
             transform-style: preserve-3d;
+            -webkit-transform-style: preserve-3d;
             cursor: pointer;
             outline: none;
             opacity: 0;
@@ -90,6 +92,7 @@
             position: absolute;
             inset: 0;
             transform-style: preserve-3d;
+            -webkit-transform-style: preserve-3d;
             transition: transform .15s ease-out;
             will-change: transform;
         }
@@ -98,12 +101,29 @@
             transition: transform .7s cubic-bezier(.4, .1, .2, 1);
         }
 
+        /* Outer layer: ONLY handles the 3D transform + backface-visibility.
+           iOS Safari fails to hide the back face if border-radius/overflow
+           live on the same element as backface-visibility, so those are
+           moved to .face-inner below. */
         .face {
             position: absolute;
             inset: 0;
-            border-radius: var(--radius);
             backface-visibility: hidden;
             -webkit-backface-visibility: hidden;
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
+        }
+
+        .face.back {
+            transform: rotateY(180deg) translateZ(0);
+            -webkit-transform: rotateY(180deg) translateZ(0);
+        }
+
+        /* Inner layer: visual styling only */
+        .face-inner {
+            position: absolute;
+            inset: 0;
+            border-radius: var(--radius);
             background: var(--paper);
             border: 1px solid var(--line);
             overflow: hidden;
@@ -113,10 +133,6 @@
             box-shadow:
                 0 26px 50px -22px rgba(13, 58, 102, .32),
                 0 8px 18px -10px rgba(13, 58, 102, .14);
-        }
-
-        .face.back {
-            transform: rotateY(180deg);
         }
 
         .topbar {
@@ -550,6 +566,7 @@
 
                 <!-- FRONT -->
                 <div class="face front">
+                  <div class="face-inner">
                     <div class="topbar"></div>
                     <div class="content">
                         <div class="row-top">
@@ -598,10 +615,12 @@
                             </div>
                         </div>
                     </div>
+                  </div>
                 </div>
 
                 <!-- BACK -->
                 <div class="face back">
+                  <div class="face-inner">
                     <div class="topbar"></div>
                     <div class="content">
                         <div class="back-head">
@@ -640,6 +659,7 @@
                             <span class="tap">TAP TO RETURN</span>
                         </div>
                     </div>
+                  </div>
                 </div>
 
             </div>
