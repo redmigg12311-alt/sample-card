@@ -693,15 +693,30 @@
                 "END:VCARD"
             ].join("\r\n");
 
-            const blob = new Blob([vcf], { type: "text/vcard;charset=utf-8" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = p.name.replace(/\s+/g, "_") + ".vcf";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            const filename = p.name.replace(/\s+/g, "_") + ".vcf";
+            const isAndroid = /Android/i.test(navigator.userAgent);
+
+            if (isAndroid) {
+                // Android: navigate straight to the vCard as text/x-vcard content
+                // (no "download" attribute) so Chrome/Android hands it to the
+                // Contacts app chooser directly instead of just saving a file
+                // to Downloads.
+                const dataUri = "data:text/x-vcard;charset=utf-8," + encodeURIComponent(vcf);
+                window.location.href = dataUri;
+            } else {
+                // iOS / desktop: Blob download works reliably here — iOS Safari
+                // shows the "Add to Contacts" preview when the .vcf is opened,
+                // and desktop OSes import it via double-click.
+                const blob = new Blob([vcf], { type: "text/vcard;charset=utf-8" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                setTimeout(() => URL.revokeObjectURL(url), 3000);
+            }
         }
 
         (function () {
