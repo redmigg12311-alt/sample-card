@@ -78,8 +78,8 @@
 
         .card-wrap {
             width: 100%;
-            aspect-ratio: 0.62/1;
-            max-height: 80vh;
+            aspect-ratio: 0.56/1;
+            max-height: 92vh;
             position: relative;
             transform-style: preserve-3d;
             -webkit-transform-style: preserve-3d;
@@ -139,7 +139,7 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            padding: 26px 24px;
+            padding: 22px 20px;
             box-shadow:
                 0 26px 50px -22px rgba(13, 58, 102, .32),
                 0 8px 18px -10px rgba(13, 58, 102, .14);
@@ -402,7 +402,7 @@
 
         /* SERVICES → IMAGE GRID */
         .services-block {
-            margin-top: 14px;
+            margin-top: 10px;
         }
 
         .services-title {
@@ -411,26 +411,26 @@
             letter-spacing: .14em;
             text-transform: uppercase;
             color: var(--blue);
-            margin: 0 0 9px;
+            margin: 0 0 7px;
         }
 
         .services-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            gap: 7px;
         }
 
         .service-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
         }
 
         .service-img {
             position: relative;
             width: 100%;
-            aspect-ratio: 4/3;
+            aspect-ratio: 1/1;
             border-radius: 12px;
             overflow: hidden;
             background: linear-gradient(135deg, var(--sky-pale), var(--sky));
@@ -451,13 +451,13 @@
             inset: 0;
             width: 100%;
             height: 100%;
-            object-fit: fit;
+            object-fit: cover;
         }
 
         .service-label {
             font-family: "JetBrains Mono", monospace;
-            font-size: 9px;
-            letter-spacing: .05em;
+            font-size: 8.5px;
+            letter-spacing: .04em;
             text-transform: uppercase;
             font-weight: 600;
             color: var(--navy);
@@ -471,8 +471,8 @@
             background: var(--sky-pale);
             border: 1px solid var(--line);
             border-radius: 16px;
-            padding: 12px 13px;
-            margin: 14px 0 10px;
+            padding: 10px 12px;
+            margin: 10px 0 8px;
         }
 
         .location-pin {
@@ -527,7 +527,7 @@
             background: var(--paper);
             border: 1.5px solid var(--navy);
             border-radius: 30px;
-            padding: 9px 12px;
+            padding: 8px 12px;
             text-decoration: none;
             cursor: pointer;
             transition: background .2s, color .2s, transform .15s;
@@ -550,28 +550,37 @@
 
         .back-foot {
             margin-top: auto;
-            padding-top: 10px;
+            padding-top: 9px;
             border-top: 1px solid var(--line);
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-family: "JetBrains Mono", monospace;
             font-size: 8.5px;
-            letter-spacing: .08em;
+            letter-spacing: .06em;
             color: var(--ink-dim);
+            gap: 8px;
         }
 
         .back-foot a {
             color: var(--blue);
             text-decoration: none;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .back-foot a:hover {
             color: var(--orange);
         }
 
-        .back-foot .tap {
-            color: var(--orange);
+        .back-foot .gst {
+            flex-shrink: 0;
+        }
+
+        .back-foot .gst b {
+            color: var(--navy);
+            font-weight: 600;
         }
 
         .hint {
@@ -708,7 +717,15 @@
                                 <div class="service-item">
                                     <div class="service-img">
                                         <span class="ph-icon"></span>
-                                        <img src="g1.png" alt="AC Generator Rewinding"
+                                        <img src="Induction motor.png" alt="Induction Motor Rewinding"
+                                            onerror="this.style.display='none'" />
+                                    </div>
+                                    <span class="service-label">Induction Motor</span>
+                                </div>
+                                <div class="service-item">
+                                    <div class="service-img">
+                                        <span class="ph-icon"></span>
+                                        <img src="AC generator.png" alt="AC Generator Rewinding"
                                             onerror="this.style.display='none'" />
                                     </div>
                                     <span class="service-label">AC Generator</span>
@@ -716,18 +733,10 @@
                                 <div class="service-item">
                                     <div class="service-img">
                                         <span class="ph-icon"></span>
-                                        <img src="s1.png" alt="Servo Motor Rewinding"
+                                        <img src="Submersible pump.png" alt="Submersible Pump Repair"
                                             onerror="this.style.display='none'" />
                                     </div>
-                                    <span class="service-label">Servo Motor</span>
-                                </div>
-                                <div class="service-item">
-                                    <div class="service-img">
-                                        <span class="ph-icon"></span>
-                                        <img src="p1.png" alt="Submersible Pump Repair"
-                                            onerror="this.style.display='none'" />
-                                    </div>
-                                    <span class="service-label">Pump Repair</span>
+                                    <span class="service-label">Submersible Pump</span>
                                 </div>
                                 <div class="service-item">
                                     <div class="service-img">
@@ -735,7 +744,7 @@
                                         <img src="24.png" alt="24x7 Emergency Service"
                                             onerror="this.style.display='none'" />
                                     </div>
-                                    <span class="service-label">Emergency Service</span>
+                                    <span class="service-label">24x7 Emergency</span>
                                 </div>
                             </div>
                         </div>
@@ -766,7 +775,7 @@
 
                         <div class="back-foot">
                             <a href="mailto:gaurav@rssrewinding.com">gaurav@rssrewinding.com</a>
-                            <span class="tap">TAP TO RETURN</span>
+                            <span class="gst">GSTIN <b>24ABOFR2030E1ZJ</b></span>
                         </div>
                     </div>
                   </div>
